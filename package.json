@@ -10,6 +10,7 @@
   "main": "./coffee2js.js",
   "readmeFilename": "README.MD",
   "dependencies": {
-    "debug": "^2.0.0"
+    "debug": "^2.0.0",
+    "docopt": "^0.4.1"
   }
 }

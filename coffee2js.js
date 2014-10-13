@@ -7,6 +7,7 @@ var debug=require('debug')('coffee2jskeepcomments')
 
 var path = require('path');  
 var lineReader = require('line-reader');
+var docopt = require('docopt').docopt;
 
 /*
 process.stdin.resume();
@@ -15,11 +16,7 @@ carrier.carry(process.stdin, function(line) {
 });
 */
 
-function help(){
-	console.log('Usage: xxx file1.coffee file2.coffee');
-}
-
-function compilefile(p){
+function compilefile(eol, p) {
 
 	var inblockcmts=false;
 	
@@ -47,16 +44,16 @@ function compilefile(p){
 				}
 			}
 		} else
-		if (!inblockcmts && line.indexOf('#') ===0 ){
+		if (!inblockcmts && line.indexOf('#') === 0) {
 			debug('singleline comments, linenum='+linenum+',inblockcmts='+inblockcmts);
 			//oneline comments
 			line = line.replace('#', ' ');
 			line = '###' + line + '###';
 		}
 		src += line;
-		src += os.EOL;
+		src += eol;
 				
-		if(last){
+		if(last) {
 			// or check if it's the last one
 			//for debugging purpose
 			//fs.writeFile(p+'.tmp.coffee', src);
@@ -64,7 +61,7 @@ function compilefile(p){
 			var dst='';
 			try {
 				dst=cs.compile(src);
-			} catch (e){
+			} catch (e) {
 				console.log(e);
 			}
 
@@ -78,7 +75,7 @@ function compilefile(p){
 			
 			debug("lines.length="+lines.length);
 			var dst2='';
-			for (var i = 0; i < lines.length; i++){
+			for (var i = 0; i < lines.length; i++) {
 				line=lines[i];
 				//debug('line='+line);
 				var x=line.indexOf('/*');
@@ -90,7 +87,7 @@ function compilefile(p){
 					debug('****line='+line);
 					line =line.replace('*/', '');
 					dst2 += line;
-					dst2 += os.EOL;
+					dst2 += eol;
 						
 					//skip the next 2 empty lines
 					line = lines[++i];
@@ -105,25 +102,21 @@ function compilefile(p){
 					continue;
 				}
 				dst2 += line;
-				dst2 += os.EOL;
+				dst2 += eol;
 			}
 			fs.writeFile(outfile, dst2);
 		}
 	});
 }
 
-function main(){
-	// print process.argv
-	//console.log(process.argv.length);
-	if (process.argv.length <=2){
-		help();
-		return;
-	}
-
-	process.argv.slice(2).forEach(function (val, index, array) {
-		console.log('Compiling:'+ index + ': ' + val);
-		compilefile(val);
-	});
+var doc = "\
+Usage:\
+  coffee2js [--force-lf-line-endings] <file.coffee>...\
+";
+var options = docopt(doc);
+var eol = options["--force-lf-line-endings"] ? "\n" : os.EOL;
+var arr = options["<file.coffee>"]
+for (var i = 0; i < arr.length; i++) {
+	console.log('Compiling:'+ i + ': ' + arr[i]);
+	compilefile(eol, arr[i]);
 }
-
-main();
