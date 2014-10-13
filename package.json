@@ -1,7 +1,7 @@
 {
   "name": "coffee-utils",
   "description": "Utils that can compile CoffeeScript to js while keeping the ALL of the original comments including single line comments",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "homepage": "http://www.transppt.com",
   "author": {
     "name": "softguy",
